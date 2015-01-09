@@ -19,6 +19,12 @@ pkgver() {
 	printf "r%s.%s" "$(git rev-list --count HEAD)" "$(git rev-parse --short HEAD)"
 }
 		 
+prepare() {
+	#Change path to api
+	cd "$srcdir/web/pageroot"
+	sed -i 's|var BaseURL = "http://localhost/modend/api";|var BaseURL = "http://konfliktspeliborlange.se/modend/api";|g' js/kibservice.js admin/js/adminservice.js
+}
+		 
 package() {
 	msg2 "Creating folder structure"
 	basepath="$pkgdir/$_PAGEROOT/"
