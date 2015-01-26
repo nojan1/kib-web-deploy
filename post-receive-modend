@@ -7,7 +7,7 @@ DSTDIR="/var/http/kib/"
 SRCDIR="$(mktemp -d)"
 
 if [ "$3" != "$TARGETBRANCH" ]; then
-	echo "Will only deploy branch $TARGETBRANCH"
+	echo "[log] Will only deploy branch $TARGETBRANCH"
 	exit
 fi
 
@@ -25,6 +25,7 @@ sed -i 's|../../kib-web/pageroot/|../../|' phpBBAuthProvider.php
 echo "[log] Copying backend(modend)"
 [ ! -f "$DSTDIR/modend" ] && mkdir -p "$DSTDIR/modend"
 cp -r $SRCDIR/src/* "$DSTDIR/modend"
+rm "$DSTDIR/modend/config_template.php"
 
 if [ ! -f "$DSTDIR/modend/config.php" ]; then
 	echo "[log] Creating sample config file, please change db login info" 
