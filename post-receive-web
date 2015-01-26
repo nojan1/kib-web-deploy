@@ -1,0 +1,37 @@
+#!/bin/bash
+
+#Input - FROM TO BRANCH
+
+TARGETBRANCH="master"
+DSTDIR="/var/http/kib/"
+SRCDIR="$(mktemp -d)"
+
+if [ "$3" != "$TARGETBRANCH" ]; then
+	echo "[log] Will only deploy branch $TARGETBRANCH...exiting"
+	exit
+fi
+
+#CHECKOUT SOUCE
+GIT_WORK_TREE="$SRCDIR" git checkout -f $TARGETBRANCH
+
+#PATCHING
+echo "[log] Patching started"
+
+#Update API path
+cd "$SRCDIR/pageroot"
+sed -i 's|kibdev.crabdance.com|konfliktspeliborlange.se|' js/kibservice.js admin/js/adminservice.js
+
+#Update path for the page css files
+cd "$SRCDIR/forum-theme/kib/theme"
+sed -i 's|../../../pageroot|../../../..|g' stylesheet.css
+
+#COPY TO SRCDIR
+echo "[log] Copying main web page files"
+cp -r $SRCDIR/pageroot/* "$DSTDIR"
+
+echo "[log] Copying forum theme"
+[ ! -f "$SRCDIR/forum/styles/" ] && mkdir -p "$SRCDIR/forum/styles/"
+cp -r "$SRCDIR/forum-theme/kib" "$SRCDIR/forum/styles/"
+
+#CLEANUP
+rm -r "$SRCDIR"

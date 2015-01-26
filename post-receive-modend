@@ -1,0 +1,38 @@
+#!/bin/bash
+
+#Input - FROM TO BRANCH
+
+TARGETBRANCH="kib"
+DSTDIR="/var/http/kib/"
+SRCDIR="$(mktemp -d)"
+
+if [ "$3" != "$TARGETBRANCH" ]; then
+	echo "Will only deploy branch $TARGETBRANCH"
+	exit
+fi
+
+#CHECKOUT SOUCE
+GIT_WORK_TREE="$SRCDIR" git checkout -f $TARGETBRANCH
+
+#PATCHING
+echo "[log] Patching started"
+
+#Update phpBB inclusion path
+cd "$SRCDIR/src/authproviders"
+sed -i 's|../../kib-web/pageroot/|../../|' phpBBAuthProvider.php
+
+#COPY TO SRCDIR
+echo "[log] Copying backend(modend)"
+[ ! -f "$DSTDIR/modend" ] && mkdir -p "$DSTDIR/modend"
+cp -r $SRCDIR/src/* "$DSTDIR/modend"
+
+if [ ! -f "$DSTDIR/modend/config.php" ]; then
+	echo "[log] Creating sample config file, please change db login info" 
+	cp "$SRCDIR/src/config_template.php" "$DSTDIR/modend/config.php"
+fi
+
+echo "[log] Remember to create database (if it doesn't already exists) using $SRCDIR/database.sql" 
+echo "[log] Also make sure all required modules are then installed"
+
+#CLEANUP
+rm -r "$SRCDIR"
