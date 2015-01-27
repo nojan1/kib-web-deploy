@@ -2,7 +2,7 @@
 
 #Input - FROM TO BRANCH
 
-TARGETBRANCH="master"
+TARGETBRANCH="deploy"
 DSTDIR="/var/http/kib/"
 SRCDIR="$(mktemp -d)"
 
