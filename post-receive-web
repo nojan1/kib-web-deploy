@@ -3,11 +3,14 @@
 #Input - FROM TO BRANCH
 
 TARGETBRANCH="deploy"
-DSTDIR="/var/http/kib/"
+DSTDIR="/home/kib/www/"
 SRCDIR="$(mktemp -d)"
 
-if [ "$3" != "$TARGETBRANCH" ]; then
-	echo "[log] Will only deploy branch $TARGETBRANCH...exiting"
+read OLDREF NEWREF REFNAME
+BRANCH=${REFNAME#refs/heads/}
+
+if [ "$BRANCH" != "$TARGETBRANCH" ]; then
+	echo "[log] Will only deploy branch $TARGETBRANCH, got $BRANCH ...exiting"
 	exit
 fi
 
