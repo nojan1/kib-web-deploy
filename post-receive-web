@@ -33,8 +33,8 @@ echo "[log] Copying main web page files"
 cp -r $SRCDIR/pageroot/* "$DSTDIR"
 
 echo "[log] Copying forum theme"
-[ ! -f "$SRCDIR/forum/styles/" ] && mkdir -p "$SRCDIR/forum/styles/"
-cp -r "$SRCDIR/forum-theme/kib" "$SRCDIR/forum/styles/"
+[ ! -d "$DSTDIR/forum/styles/" ] && mkdir -p "$DSTDIR/forum/styles/"
+cp -r "$SRCDIR/forum-theme/kib" "$DSTDIR/forum/styles/"
 
 #CLEANUP
 rm -r "$SRCDIR"
