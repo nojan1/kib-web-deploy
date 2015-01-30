@@ -22,7 +22,7 @@ echo "[log] Patching started"
 
 #Update phpBB inclusion path
 cd "$SRCDIR/src/authproviders"
-sed -i 's|../../kib-web/pageroot/|../../|' phpBBAuthProvider.php
+sed -i 's|../../kib-web/pageroot/|../|' phpBBAuthProvider.php
 
 #COPY TO SRCDIR
 echo "[log] Copying backend(modend)"
