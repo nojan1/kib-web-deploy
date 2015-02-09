@@ -31,7 +31,10 @@ sed -i 's|../../../pageroot|../../../..|g' stylesheet.css
 #Start Bower to install deps
 echo "[log] Starting 'bower install'"
 cd "$SRCDIR/pageroot"
-bower install
+bower -q install
+
+#Delete bower.json to prevent version info leakage
+rm bower.json
 
 #COPY TO SRCDIR
 echo "[log] Copying main web page files"
