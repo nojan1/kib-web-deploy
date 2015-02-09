@@ -28,6 +28,11 @@ sed -i 's|kibdev.crabdance.com|konfliktspeliborlange.se|' js/kibservice.js admin
 cd "$SRCDIR/forum-theme/kib/theme"
 sed -i 's|../../../pageroot|../../../..|g' stylesheet.css
 
+#Start Bower to install deps
+echo "[log] Starting 'bower install'"
+cd "$SRCDIR/pageroot"
+bower install
+
 #COPY TO SRCDIR
 echo "[log] Copying main web page files"
 cp -r $SRCDIR/pageroot/* "$DSTDIR"
