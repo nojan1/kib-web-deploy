@@ -4,7 +4,7 @@
 
 TARGETBRANCH="deploy"
 DSTDIR="/home/kib/www/"
-SRCDIR="$(mktemp -d)"
+SRCDIR="/home/kib/pagebuild"
 
 read OLDREF NEWREF REFNAME
 BRANCH=${REFNAME#refs/heads/}
@@ -15,34 +15,40 @@ if [ "$BRANCH" != "$TARGETBRANCH" ]; then
 fi
 
 #CHECKOUT SOUCE
+[ ! -d $SRCDIR ] && mkdir -p $SRCDIR
 GIT_WORK_TREE="$SRCDIR" git checkout -f $TARGETBRANCH
+
+#Build page
+cd "$SRCDIR/pageroot"
+
+echo "[log] Checking build prerequisites"
+npm --quiet install
+bower --quiet install
+
+echo "[log] Building page"
+gulp build
 
 #PATCHING
 echo "[log] Patching started"
 
 #Update API path
-cd "$SRCDIR/pageroot"
-sed -i 's|kibdev.crabdance.com|konfliktspeliborlange.se|' js/kibservice.js admin/js/adminservice.js
+sed -i 's|kibdev.crabdance.com|konfliktspeliborlange.se|' dist/scripts/app-*.js
+
+#Find name of current app CSS
+cssname=$(cd dist; ls styles/app-*.css | head -n 1)
+echo "[log] Current app CSS is - $cssname"
 
 #Update path for the page css files
 cd "$SRCDIR/forum-theme/kib/theme"
-sed -i 's|../../../pageroot|../../../..|g' stylesheet.css
-
-#Start Bower to install deps
-echo "[log] Starting 'bower install'"
-cd "$SRCDIR/pageroot"
-bower -q install
-
-#Delete bower.json to prevent version info leakage
-rm bower.json
+sed -i "s|/\* KiB-Styles \*/.*?/\* -- \*/|@import url("../../../$cssname");|g" stylesheet.css 
 
 #COPY TO SRCDIR
 echo "[log] Copying main web page files"
-cp -r $SRCDIR/pageroot/* "$DSTDIR"
+cp -r $SRCDIR/pageroot/dist/* "$DSTDIR"
 
 echo "[log] Copying forum theme"
 [ ! -d "$DSTDIR/forum/styles/" ] && mkdir -p "$DSTDIR/forum/styles/"
 cp -r "$SRCDIR/forum-theme/kib" "$DSTDIR/forum/styles/"
 
 #CLEANUP
-rm -r "$SRCDIR"
+rm -r "$SRCDIR/pageroot/{src,dist}"
